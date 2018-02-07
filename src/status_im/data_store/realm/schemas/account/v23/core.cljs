@@ -1,11 +1,10 @@
 (ns status-im.data-store.realm.schemas.account.v23.core
   (:require [status-im.data-store.realm.schemas.account.v22.chat :as chat]
+            [status-im.data-store.realm.schemas.account.v22.transport :as transport]
             [status-im.data-store.realm.schemas.account.v1.chat-contact :as chat-contact]
             [status-im.data-store.realm.schemas.account.v19.contact :as contact]
             [status-im.data-store.realm.schemas.account.v20.discover :as discover]
-            [status-im.data-store.realm.schemas.account.v23.message :as message]
-            [status-im.data-store.realm.schemas.account.v12.pending-message :as pending-message]
-            [status-im.data-store.realm.schemas.account.v1.processed-message :as processed-message]
+            [status-im.data-store.realm.schemas.account.v23.message :as message] 
             [status-im.data-store.realm.schemas.account.v19.request :as request]
             [status-im.data-store.realm.schemas.account.v19.user-status :as user-status]
             [status-im.data-store.realm.schemas.account.v5.contact-group :as contact-group]
@@ -19,11 +18,10 @@
 
 (def schema [chat/schema
              chat-contact/schema
+             transport/schema
              contact/schema
              discover/schema
-             message/schema
-             pending-message/schema
-             processed-message/schema
+             message/schema 
              request/schema
              user-status/schema
              contact-group/schema

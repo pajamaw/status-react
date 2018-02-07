@@ -17,7 +17,7 @@
    [toolbar/content-title ""]])
 
 (defn actions [{:keys [pending? whisper-identity dapp?]}]
-  (concat (if pending?
+  (concat (if (or (nil? pending?) pending?)
             [{:label               (i18n/label :t/add-to-contacts)
               :icon                :icons/add-contact
               :action              #(re-frame/dispatch [:add-contact whisper-identity])

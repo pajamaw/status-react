@@ -58,7 +58,7 @@
 
 (defview message-content-command
   [{:keys [content params] :as message}]
-  (letsubs [command [:get-command (:content-command-ref content)]]
+  (letsubs [command [:get-command (:command-ref content)]]
     (let [preview (:preview content)
           {:keys [color] icon-path :icon} command]
       [react/view style/content-command-view
@@ -119,7 +119,7 @@
                   (fn [text-seq]
                     (map (fn [text] {:text text :url? false}) text-seq))))
 
-(defn- autolink [string on-press]
+(defn- autolink [string event-on-press]
   (->> (parse-url string)
        (map-indexed (fn [idx {:keys [text url?]}]
                       (if url?
@@ -127,7 +127,7 @@
                           [react/text
                            {:key      idx
                             :style    {:color colors/blue}
-                            :on-press #(on-press url)}
+                            :on-press #(re-frame/dispatch [event-on-press url])}
                            url])
                         text)))
        vec))
@@ -142,7 +142,7 @@
        replacements))
 
 ;; todo rewrite this, naive implementation
-(defn- parse-text [string url-on-press]
+(defn- parse-text [string event-on-press]
   (parse-str-regx string
                   regx-styled
                   (fn [text-seq]
@@ -157,14 +157,21 @@
                     (map-indexed (fn [idx string]
                                    (apply react/text
                                           {:key (str idx "_" string)}
-                                          (autolink string url-on-press)))
+                                          (autolink string event-on-press)))
                                  text-seq))))
+
+(def cached-parse-text (memoize parse-text))
 
 (defn text-message
   [{:keys [content] :as message}]
   [message-view message
-   (let [parsed-text (parse-text content #(re-frame/dispatch [:browse-link-from-message %]))]
+   (let [parsed-text (cached-parse-text content :browse-link-from-message)]
      [react/text {:style (style/text-message message)} parsed-text])])
+
+(defn placeholder-message
+  [{:keys [content] :as message}]
+  [message-view message
+   [react/text {:style (style/text-message message)} content]])
 
 (defmulti message-content (fn [_ message _] (message :content-type)))
 
@@ -189,6 +196,10 @@
   [wrapper message]
   [wrapper message
    [message-view message [message-content-command message]]])
+
+(defmethod message-content constants/content-type-placeholder
+  [wrapper message]
+  [wrapper message [placeholder-message message]])
 
 (defmethod message-content :default
   [wrapper {:keys [content-type content] :as message}]
@@ -285,21 +296,20 @@
      content]]
    (when last-outgoing?
      [react/view style/delivery-status
-     (if (or (= (keyword message-type) :group-user-message)
-             group-chat)
-       [group-message-delivery-status message]
-       [message-delivery-status message])])])
+      (if (= message-type :group-user-message)
+        [group-message-delivery-status message]
+        [message-delivery-status message])])])
 
 (defn message-container-animation-logic [{:keys [to-value val callback]}]
   (fn [_]
     (let [to-value @to-value]
       (when (pos? to-value)
         (animation/start
-         (animation/timing val {:toValue  to-value
-                                :duration 250})
-         (fn [arg]
-           (when (.-finished arg)
-             (callback))))))))
+          (animation/timing val {:toValue  to-value
+                                 :duration 250})
+          (fn [arg]
+            (when (.-finished arg)
+              (callback))))))))
 
 (defn message-container [message & children]
   (if (:appearing? message)
@@ -326,6 +336,7 @@
                   children)])}))
     (into [react/view] children)))
 
+<<<<<<< 3086067612c886a14f50b0949c086591f764bd7e
 (defn chat-message [{:keys [outgoing message-id chat-id from current-public-key] :as message}]
   (reagent/create-class
     {:display-name
@@ -350,3 +361,16 @@
             [message-content message-body (merge message
                                                  {:current-public-key current-public-key
                                                   :incoming-group     incoming-group})])]]])}))
+=======
+(defn chat-message [{:keys [outgoing group-chat current-public-key content-type content] :as message}]
+  [message-container message
+   [react/touchable-highlight {:on-press      #(when platform/ios?
+                                                 (react/dismiss-keyboard!))
+                               :on-long-press #(when (= content-type constants/text-content-type)
+                                                 (list-selection/share content (i18n/label :t/message)))}
+    [react/view
+     (let [incoming-group (and group-chat (not outgoing))]
+       [message-content message-body (merge message
+                                            {:current-public-key current-public-key
+                                             :incoming-group     incoming-group})])]]])
+>>>>>>> First working version of new protocol

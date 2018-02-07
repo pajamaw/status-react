@@ -4,9 +4,8 @@
 
 (handlers/register-handler-fx
   :help-improve-handler
-  (fn [{db :db} [_ yes? address]]
+  (fn [cofx [_ yes? address]]
     (merge (when yes?
-             (accounts/account-update {:db db} {:sharing-usage-data? true}))
+             (accounts/account-update {:sharing-usage-data? true} cofx))
            {:dispatch-n [(when yes? [:register-mixpanel-tracking address])
                          [:account-finalized]]})))
-

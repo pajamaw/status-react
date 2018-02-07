@@ -1,10 +1,11 @@
 (ns status-im.ui.screens.events
   (:require status-im.bots.events
-            status-im.chat.handlers
+            status-im.chat.events
             status-im.commands.handlers.jail
             status-im.commands.events.loading
             status-im.commands.handlers.debug
             status-im.network.events
+            status-im.transport.handlers
             status-im.protocol.handlers
             status-im.ui.screens.accounts.events
             status-im.ui.screens.accounts.login.events
@@ -31,6 +32,7 @@
             [status-im.data-store.core :as data-store]
             [status-im.i18n :as i18n]
             [status-im.js-dependencies :as dependencies]
+            [status-im.transport.core :as transport]
             [status-im.ui.screens.db :refer [app-db]]
             [status-im.utils.datetime :as time]
             [status-im.utils.ethereum.core :as ethereum]
@@ -50,7 +52,7 @@
 ;;;; Helper fns
 
 (defn- call-jail-function
-  [{:keys [chat-id function callback-events-creator] :as opts}]
+  [{:keys [chat-id function callback-event-creator] :as opts}]
   (let [path   [:functions function]
         params (select-keys opts [:parameters :context])]
     (status/call-jail
@@ -58,12 +60,11 @@
       :path    path
       :params  params
       :callback (fn [jail-response]
-                  (doseq [event (if callback-events-creator
-                                  (callback-events-creator jail-response)
-                                  [[:chat-received-message/bot-response
-                                    {:chat-id chat-id}
-                                    jail-response]])
-                          :when event]
+                  (when-let [event (if callback-event-creator
+                                     (callback-event-creator jail-response)
+                                     [:chat-received-message/bot-response
+                                      {:chat-id chat-id}
+                                      jail-response])]
                     (re-frame/dispatch event)))})))
 
 ;;;; COFX
@@ -89,15 +90,14 @@
 
 (re-frame/reg-fx
   :call-jail
-  (fn [{:keys [callback-events-creator] :as opts}]
+  (fn [{:keys [callback-event-creator] :as opts}]
     (status/call-jail
      (-> opts
-         (dissoc :callback-events-creator)
+         (dissoc :callback-event-creator)
          (assoc :callback
                 (fn [jail-response]
-                  (when callback-events-creator
-                    (doseq [event (callback-events-creator jail-response)]
-                      (re-frame/dispatch event)))))))))
+                  (when-let [event (callback-event-creator jail-response)]
+                    (re-frame/dispatch event))))))))
 
 (re-frame/reg-fx
   :call-jail-function
@@ -228,6 +228,20 @@
                                    [:initialize-geth]]}))
 
 (handlers/register-handler-fx
+  :logout
+  (fn [{:keys [db] :as cofx} _]
+    (let [{:transport/keys [chats] :keys [current-account-id]} db
+          sharing-usage-data? (get-in db [:accounts/accounts current-account-id :sharing-usage-data?])]
+      (handlers/merge-fx cofx
+                         {:dispatch-n (concat [[:initialize-db]
+                                               [:load-accounts]
+                                               [:listen-to-network-status]
+                                               [:navigate-to :accounts]]
+                                              (when sharing-usage-data?
+                                                [[:unregister-mixpanel-tracking]]))}
+                         (transport/stop-whisper)))))
+
+(handlers/register-handler-fx
   :initialize-db
   (fn [{{:keys          [status-module-initialized? status-node-started?
                          network-status network]
@@ -275,7 +289,6 @@
   :initialize-account
   (fn [_ [_ address events-after]]
     {:dispatch-n (cond-> [[:initialize-account-db address]
-                          [:load-processed-messages]
                           [:initialize-protocol address]
                           [:initialize-sync-listener]
                           [:initialize-chats]
