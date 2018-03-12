@@ -25,4 +25,6 @@
    :empty-recent    (js/require "./resources/images/ui/empty-recent.png")
    :analytics-image (js/require "./resources/images/ui/analytics-image.png")
    :welcome-image   (js/require "./resources/images/ui/welcome-image.png")
-   :lock            (js/require "./resources/images/ui/lock.png")})
+   :lock            (js/require "./resources/images/ui/lock.png")
+   :wallet-welcome  (js/require "./resources/images/ui/wallet-welcome.png")
+   :wallet-setup    (js/require "./resources/images/ui/wallet-setup.png")})

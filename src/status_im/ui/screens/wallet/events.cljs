@@ -1,5 +1,6 @@
 (ns status-im.ui.screens.wallet.events
   (:require [re-frame.core :as re-frame :refer [dispatch reg-fx]]
+            [status-im.data-store.accounts :as accounts-store]
             [status-im.i18n :as i18n]
             [status-im.ui.screens.wallet.navigation]
             [status-im.utils.ethereum.core :as ethereum]
@@ -83,6 +84,11 @@
   :update-gas-price
   (fn [{:keys [web3 success-event edit?]}]
     (ethereum/gas-price web3 #(re-frame/dispatch [success-event %2 edit?]))))
+
+(re-frame/reg-fx
+  ::save-account
+  (fn [account]
+    (accounts-store/save account true)))
 
 ;; Handlers
 
@@ -224,3 +230,12 @@
   :wallet/show-error
   (fn []
     {:show-error (i18n/label :t/wallet-error)}))
+
+(handlers/register-handler-fx
+  :wallet/set-up-passed
+  (fn [{{:accounts/keys [accounts current-account-id] :as db} :db}]
+    (let [current-account (get accounts current-account-id)
+          new-account (assoc current-account :wallet-set-up-passed? true)]
+      {:db            (assoc-in db [:accounts/accounts current-account-id] new-account)
+       ::save-account new-account
+       :dispatch      [:navigate-back]})))

@@ -15,6 +15,9 @@
                           :photo-path          :string
                           :signing-phrase      {:type :string}
                           :mnemonic            {:type :string}
+                          ;; TODO(alwx): move it to v9.account
+                          :wallet-set-up-passed? {:type    :bool
+                                                  :default false}
                           :last-updated        {:type :int :default 0}
                           :last-sign-in        {:type :int :default 0}
                           :signed-up?          {:type    :bool

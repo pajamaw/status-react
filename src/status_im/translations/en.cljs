@@ -153,6 +153,14 @@
    :word-n-description                   "In order to check if have backed up your seed phrase correctly, enter the word #{{number}} above"
    :word-n                               "Word #{{number}}"
 
+   :wallet-onboarding-title              "Simple and secure cryptocurrency wallet"
+   :wallet-onboarding-description        "Lorem ipsum"
+   :wallet-onboarding-set-up             "Set up my Wallet"
+   :wallet-set-up-title                  "Set up your wallet"
+   :wallet-set-up-signing-phrase         "This is your personal signing phrase. You'll see it everytime you make a transaction. Only confirm a transaction when you see your signing phrase."
+   :wallet-set-up-confirm-title          "Are you sure?"
+   :wallet-set-up-confirm-description    "You will not be able to see the whole signing phrase again"
+
    ;;make_photo
    :image-source-title                   "Edit picture"
    :image-source-make-photo              "Capture"
