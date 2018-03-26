@@ -53,8 +53,7 @@
 
 (defn prepare-recipients [public-keys db]
   (map (fn [public-key]
-         {:public-key public-key
-          :topic      (get-in db [:transport/chats public-key :topic])})
+         (select-keys (get-in db [:transport/chats public-key]) [:topic :sym-key-id]))
        public-keys))
 
 (defn multi-send-with-pubkey [{:keys [payload public-keys success-event]} {:keys [db] :as cofx}]
