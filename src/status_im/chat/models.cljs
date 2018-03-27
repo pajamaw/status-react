@@ -104,7 +104,7 @@
                      (update :chats dissoc chat-id)
                      (update :deleted-chats (fnil conj #{}) chat-id))}
       (or group-chat debug?)
-      (assoc :delete-messages chat-id)
+      (assoc :data-store/delete-messages chat-id)
       debug?
       (assoc :data-store/delete-chat chat-id)
       (not debug?)

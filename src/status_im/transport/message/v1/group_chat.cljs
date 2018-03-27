@@ -125,14 +125,16 @@
                    cofx))
   (receive [this chat-id signature {:keys [db now] :as cofx}]
     (let [message-id               (transport.utils/message-id this)
+          me                       (:current-public-key db)
           participant-leaving-name (or (get-in db [:contacts/contacts signature :name])
                                        signature)]
-      (handlers/merge-fx cofx
-                         (models.message/receive
-                          (models.message/system-message chat-id message-id now
-                                                         (str participant-leaving-name " " (i18n/label :t/left))))
-                         (group/participants-removed chat-id #{signature})
-                         (send-new-group-key nil chat-id)))))
+      (when-not (= me signature)
+        (handlers/merge-fx cofx
+                           (models.message/receive
+                            (models.message/system-message chat-id message-id now
+                                                           (str participant-leaving-name " " (i18n/label :t/left))))
+                           (group/participants-removed chat-id #{signature})
+                           (send-new-group-key nil chat-id))))))
 
 (handlers/register-handler-fx
   ::unsubscribe-from-chat
