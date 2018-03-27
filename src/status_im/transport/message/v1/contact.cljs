@@ -68,7 +68,6 @@
   (send [this _ {:keys [db] :as cofx}]
     (let [message-id (transport.utils/message-id this)
           public-keys (remove nil? (map :public-key (vals (:contacts/contacts db))))]
-      (println public-keys)
       (handlers/merge-fx cofx
                          (protocol/multi-send-with-pubkey {:public-keys public-keys
                                                            :payload     this}))))
