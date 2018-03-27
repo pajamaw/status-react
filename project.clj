@@ -69,7 +69,7 @@
                                                         :preamble      ["js/hook-require.js"]
                                                         :target        :nodejs}}
                                         {:id           "protocol"
-                                         :source-paths ["src" "test/cljs"]
+                                         :source-paths ["components/src" "src" "test/cljs"]
                                          :compiler     {:main          status-im.test.protocol.runner
                                                         :output-to     "target/test/test.js"
                                                         :output-dir    "target/test"

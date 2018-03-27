@@ -7,7 +7,8 @@
     "postinstall": "./postinstall.sh"
   },
   "devDependencies": {
-    "rn-nodeify": "8.2.0"
+    "rn-nodeify": "8.2.0",
+    "sleep": "^5.1.1"
   },
   "dependencies": {
     "assert": "1.4.1",
