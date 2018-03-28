@@ -4,19 +4,21 @@ services:
     build: ./clojure
     volumes:
       - "../../:/srv"
-    command: lein test-protocol
+    command: make test-protocol-auto
     working_dir: "/srv"
+    environment:
+      WNODE_ADDRESS: "http://172.16.238.11:8545"
     links:
       - wnode
-
+    networks:
+      cluster:
+        ipv4_address: 172.16.238.12
   bootnode:
     image: ethereum/client-go:alltools-latest
     entrypoint: bootnode
     command: -addr=:30303 -nodekey /static/keys/bootnode.key
     ports:
       - 30303
-    volumes:
-      - ./../../../static/keys:/static/keys:ro
     networks:
       cluster:
         ipv4_address: 172.16.238.10
@@ -39,6 +41,9 @@ services:
       - 30303
     depends_on:
       - bootnode
+    networks:
+      cluster:
+        ipv4_address: 172.16.238.11
 networks:
   cluster:
     driver: overlay
