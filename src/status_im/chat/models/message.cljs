@@ -246,7 +246,9 @@
   (upsert-and-send (prepare-plain-message params (get-in db [:chats chat-id]) now) cofx))
 
 (defn- prepare-command-message
-  [identity {:keys [last-to-clock-value last-from-clock-value chat-id] :as chat} now
+  [identity
+   {:keys [last-to-clock-value last-from-clock-value chat-id] :as chat}
+   now
    {request-params  :params
     request-command :command
     :keys           [prefill prefillBotDb]

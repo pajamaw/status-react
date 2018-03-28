@@ -181,7 +181,7 @@
 (defn- fire-off-chat-loaded-event
   [chat-id {:keys [db]}]
   (when-let [event (get-in db [:chats chat-id :chat-loaded-event])]
-    {:db       (update-in [:chats chat-id] dissoc :chat-loaded-event)
+    {:db       (update-in db [:chats chat-id] dissoc :chat-loaded-event)
      :dispatch event}))
 
 (defn- preload-chat-data

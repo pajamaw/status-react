@@ -19,7 +19,7 @@
 (handlers/register-handler-fx
   :chat-send-message/send-command
   message-model/send-interceptors
-  (fn [cofx [_ params]]
+  (fn [cofx [params]]
     (message-model/send-command cofx params)))
 
 (handlers/register-handler-fx
