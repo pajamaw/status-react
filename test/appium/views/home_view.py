@@ -8,7 +8,7 @@ from views.base_view import BaseView
 class PlusButton(BaseButton):
     def __init__(self, driver):
         super(PlusButton, self).__init__(driver)
-        self.locator = self.Locator.xpath_selector("//*[@text='+']")
+        self.locator = self.Locator.accessibility_id("plus-button")
 
     def navigate(self):
         from views.start_new_chat_view import StartNewChatView
@@ -123,5 +123,11 @@ class HomeView(BaseView):
         x, y = location['x'], location['y']
         size = chat_element.find_element().size
         width, height = size['width'], size['height']
-        self.driver.swipe(start_x=x + width / 2, start_y=y + height / 2, end_x=x, end_y=y + height / 2)
+        counter = 0
+        while counter < 10:
+            self.driver.swipe(start_x=x + width / 2, start_y=y + height / 2, end_x=x, end_y=y + height / 2)
+            if chat_element.swipe_delete_button.is_element_present():
+                break
+            time.sleep(10)
+            counter += 1
         chat_element.swipe_delete_button.click()

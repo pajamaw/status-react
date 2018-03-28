@@ -105,3 +105,5 @@ class SignInView(BaseView):
         recover_access_view.password_input.click()
         recover_access_view.password_input.set_value(password)
         recover_access_view.sign_in_button.click()
+        self.element_by_text("NO, I DON'T WANT TO SHARE").wait_for_element(10)
+        self.element_by_text("NO, I DON'T WANT TO SHARE").click()
