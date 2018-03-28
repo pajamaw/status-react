@@ -79,14 +79,16 @@
 (defrecord Message [content content-type message-type to-clock-value timestamp]
   message/StatusMessage
   (send [this chat-id cofx]
-    (send {:chat-id       chat-id
-           :payload       this
-           :success-event [:update-message-status
-                           chat-id
-                           (transport.utils/message-id this)
-                           (get-in cofx [:db :current-public-key])
-                           :sent]}
-          cofx))
+    (let [args {:chat-id       chat-id
+                :payload       this
+                :success-event [:update-message-status
+                                chat-id
+                                (transport.utils/message-id this)
+                                (get-in cofx [:db :current-public-key])
+                                :sent]}]
+      (if (get-in cofx [:db :transport/chats chat-id :sym-key-id])
+        (send args cofx)
+        (send-with-pubkey args cofx))))
   (receive [this chat-id signature cofx]
     {:dispatch [:chat-received-message/add (assoc (into {} this)
                                                   :message-id (transport.utils/message-id this)
