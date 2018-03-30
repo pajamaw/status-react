@@ -76,8 +76,8 @@
   (when-not (data-store/exists? message-id)
     (data-store/save (prepare-message (merge default-values
                                              message
-                                             {:from      (or from "anonymous")
-                                              :timestamp (datetime/timestamp)})))))
+                                             {:from               (or from "anonymous")
+                                              :received-timestamp (datetime/timestamp)})))))
 
 (defn update-message
   [{:keys [message-id] :as message}]

@@ -7,10 +7,10 @@
   (:refer-clojure :exclude [exists?]))
 
 (defn- normalize-chat [{:keys [chat-id] :as chat}]
-  (let [last-message (messages/get-last-message chat-id)]
+  (let [last-clock-value (messages/get-last-clock-value chat-id)]
     (-> chat
         (realm/fix-map->vec :contacts)
-        (assoc :last-clock-value (or (:clock-value last-message) 0)))))
+        (assoc :last-clock-value (or last-clock-value 0)))))
 
 (defn get-all-active
   []

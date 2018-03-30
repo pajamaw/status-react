@@ -1,11 +1,12 @@
 (ns status-im.chat.events.receive-message
   (:require [re-frame.core :as re-frame]
-            [taoensso.timbre :as log] 
+            [taoensso.timbre :as log]
             [status-im.data-store.messages :as messages-store]
             [status-im.chat.events.commands :as commands-events]
             [status-im.chat.models.message :as message-model]
             [status-im.constants :as constants]
             [status-im.utils.handlers :as handlers]
+            [status-im.utils.clocks :as utils.clocks]
             [status-im.utils.random :as random]))
 
 ;;;; Handlers
@@ -67,6 +68,7 @@
                                  :content-type constants/content-type-log-message
                                  :outgoing     false
                                  :chat-id      chat-id
+                                 :clock-value  (utils.clocks/send 0)
                                  :from         chat-id
                                  :to           "me"}]))))
       (when content
@@ -75,6 +77,7 @@
                              :content      (str content)
                              :content-type constants/text-content-type
                              :outgoing     false
+                             :clock-value  (utils.clocks/send 0)
                              :chat-id      chat-id
                              :from         chat-id
                              :to           "me"}])))))

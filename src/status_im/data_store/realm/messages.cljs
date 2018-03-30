@@ -52,11 +52,11 @@
       (realm/page from (+ from number-of-messages))
       realm/js-object->clj))
 
-(defn get-last-message
-  [chat-id]
+(defn get-last-clock-value [chat-id]
   (-> (realm/get-by-field @realm/account-realm :message :chat-id chat-id)
       (realm/sorted :clock-value :desc)
-      (realm/single-clj)))
+      (realm/single-clj)
+      :clock-value))
 
 (defn get-unviewed
   [current-public-key]
