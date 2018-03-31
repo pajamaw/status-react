@@ -88,14 +88,14 @@ class SignInView(BaseView):
         self.confirm_password_input = ConfirmPasswordInput(self.driver)
         self.name_input = NameInput(self.driver)
 
-    def create_user(self):
+    def create_user(self, username: str='user_%s' % get_current_time()):
         self.create_account_button.click()
         self.password_input.set_value('qwerty1234')
         self.next_button.click()
         self.confirm_password_input.set_value('qwerty1234')
         self.next_button.click()
         self.name_input.wait_for_element(45)
-        self.name_input.set_value('user_%s' % get_current_time())
+        self.name_input.set_value(username)
         self.next_button.click()
         self.element_by_text("NO, I DON'T WANT TO SHARE").click()
 
