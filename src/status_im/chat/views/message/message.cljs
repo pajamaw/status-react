@@ -336,41 +336,14 @@
                   children)])}))
     (into [react/view] children)))
 
-<<<<<<< 3086067612c886a14f50b0949c086591f764bd7e
-(defn chat-message [{:keys [outgoing message-id chat-id from current-public-key] :as message}]
-  (reagent/create-class
-    {:display-name
-     "chat-message"
-     :component-did-mount
-     ;; send `:seen` signal when we have signed-in user, message not from us and we didn't sent it already
-     #(when (and current-public-key message-id chat-id (not outgoing)
-                 (not (models.message/message-seen-by? message current-public-key)))
-        (re-frame/dispatch [:send-seen! {:chat-id    chat-id
-                                         :from       from
-                                         :me         current-public-key
-                                         :message-id message-id}]))
-     :reagent-render
-     (fn [{:keys [outgoing group-chat content-type content] :as message}]
-       [message-container message
-        [react/touchable-highlight {:on-press      #(when platform/ios?
-                                                      (react/dismiss-keyboard!))
-                                    :on-long-press #(when (= content-type constants/text-content-type)
-                                                      (list-selection/share content (i18n/label :t/message)))}
-         [react/view {:accessibility-label :chat-item}
-          (let [incoming-group (and group-chat (not outgoing))]
-            [message-content message-body (merge message
-                                                 {:current-public-key current-public-key
-                                                  :incoming-group     incoming-group})])]]])}))
-=======
 (defn chat-message [{:keys [outgoing group-chat current-public-key content-type content] :as message}]
   [message-container message
    [react/touchable-highlight {:on-press      #(when platform/ios?
                                                  (react/dismiss-keyboard!))
                                :on-long-press #(when (= content-type constants/text-content-type)
                                                  (list-selection/share content (i18n/label :t/message)))}
-    [react/view
+    [react/view {:accessibility-label :chat-item}
      (let [incoming-group (and group-chat (not outgoing))]
        [message-content message-body (merge message
                                             {:current-public-key current-public-key
                                              :incoming-group     incoming-group})])]]])
->>>>>>> First working version of new protocol
